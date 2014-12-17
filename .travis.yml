@@ -1,12 +1,23 @@
 language: go
-
 go:
-  - tip
-
+- tip
 branches:
   only:
-    - develop
-
+  - develop
 install: go get -v github.com/spf13/hugo
-
 script: hugo
+env:
+  global:
+    secure: "BhO9ip71/4wjVELGnOP+RvdAjUtauLZxAteMNIrkqEYOcU5z2fcVN14KIWTQD/JhdTJiWREwoMklrEQeDHD2yshqLc67nmJxDE5n6Z5QD0kxV5ruqhpryQjxqLvKh4q/53G3D0iWWXEHN7695ivTkHLstQE9ODJjPv04CGhxLRo="
+after_success:
+  - git config --global user.email "$GIT_EMAIL"
+  - git config --global user.name "$GIT_NAME"
+  - export REMOTE=$(git config remote.origin.url | sed 's/.*:\/\///')
+  - git remote add github https://${GH_TOKEN}@${REMOTE}
+  - mkdir publish
+  - cd publish
+  - echo "Hello world! Build: $TRAVIS_COMMIT" > index.html
+  - git add --all
+  - git status
+  - git commit -m "Built by Travis ($TRAVIS_BUILD_NUMBER)"
+  - git push github master
